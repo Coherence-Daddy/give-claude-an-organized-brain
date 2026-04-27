@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Give Claude an Organized Brain — Coherent Obsidian Skills · 01</title>
+<meta name="description" content="Adopt kepano-style frontmatter graphs in your Obsidian vault and install the Obsidian Power-User skill so Claude reasons over your notes as a typed knowledge graph. 11-slide visual walkthrough.">
+<link rel="canonical" href="https://coherencedaddy.com/tutorials/give-claude-an-organized-brain">
+<meta property="og:title" content="Give Claude an Organized Brain">
+<meta property="og:description" content="Folders organize bytes. Frontmatter organizes meaning. Turn your Obsidian vault into a typed knowledge graph Claude can reason about.">
+<meta property="og:image" content="https://coherencedaddy.com/tutorials/give-claude-an-organized-brain/og.png">
+<meta property="og:url" content="https://coherencedaddy.com/tutorials/give-claude-an-organized-brain">
+<meta property="og:type" content="article">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Give Claude an Organized Brain">
+<meta name="twitter:description" content="Adopt kepano-style frontmatter graphs in your Obsidian vault. 11 slides, ~5 min read.">
+<meta name="twitter:image" content="https://coherencedaddy.com/tutorials/give-claude-an-organized-brain/og.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1882924299982046" crossorigin="anonymous"></script>
+<style>
+  :root {
+    --canvas: #0E0E10;
+    --surface: #18181B;
+    --surface-2: #1D1D20;
+    --surface-3: #232327;
+    --ink: #F2F1ED;
+    --muted: #A1A1A6;
+    --whisper: rgba(255,255,255,0.08);
+    --whisper-strong: rgba(255,255,255,0.14);
+    --accent: #FF6B4A;
+    --accent-pressed: #E5553A;
+    --success: #4A9D7C;
+    --danger: #D94343;
+    --warn: #D29922;
+    --blue: #5B9DF9;
+    --purple: #A37BF9;
+
+    --font-sans: "Geist", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --font-mono: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace;
+
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+    --radius-xl: 24px;
+
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.32);
+    --shadow-lg: 0 12px 40px rgba(0,0,0,0.42);
+    --shadow-xl: 0 24px 64px rgba(0,0,0,0.5);
+
+    --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+    --sidebar-w: 280px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; overflow: hidden; }
+  body {
+    background: var(--canvas);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 17px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection { background: var(--accent); color: var(--canvas); }
+
+  .app { display: grid; grid-template-columns: var(--sidebar-w) 1fr; height: 100vh; }
+
+  .sidebar {
+    background: var(--surface);
+    border-right: 1px solid var(--whisper);
+    padding: 28px 22px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .sidebar::-webkit-scrollbar { width: 6px; }
+  .sidebar::-webkit-scrollbar-track { background: transparent; }
+  .sidebar::-webkit-scrollbar-thumb { background: var(--whisper-strong); border-radius: 3px; }
+
+  .brand {
+    display: flex; align-items: center; gap: 12px;
+    padding: 0 4px 22px; margin-bottom: 14px;
+    border-bottom: 1px solid var(--whisper);
+  }
+  .brand-mark { width: 30px; height: 30px; }
+  .brand-text { display: flex; flex-direction: column; line-height: 1.05; }
+  .brand-text .name { font-size: 0.92rem; font-weight: 700; letter-spacing: -0.01em; }
+  .brand-text .tag {
+    font-family: var(--font-mono); font-size: 0.6rem; font-weight: 500;
+    letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); margin-top: 3px;
+  }
+
+  .toc-section {
+    font-family: var(--font-mono); font-size: 0.6rem; font-weight: 600;
+    letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent);
+    margin: 16px 8px 8px; display: flex; align-items: center; gap: 8px;
+  }
+  .toc-section::before { content: ""; width: 14px; height: 1px; background: var(--accent); }
+  .toc-section:first-of-type { margin-top: 0; }
+
+  .toc-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 10px; border-radius: var(--radius-sm);
+    cursor: pointer; color: var(--muted); font-size: 0.84rem;
+    transition: background 180ms var(--ease), color 180ms var(--ease);
+    border-left: 2px solid transparent; margin-left: -2px;
+    line-height: 1.3; text-align: left; background: transparent;
+    border-top: 0; border-right: 0; border-bottom: 0; width: 100%;
+    font-family: inherit;
+  }
+  .toc-item:hover { color: var(--ink); background: rgba(255,255,255,0.03); }
+  .toc-item.active {
+    color: var(--ink); background: rgba(255,107,74,0.08);
+    border-left-color: var(--accent);
+  }
+  .toc-item .num {
+    font-family: var(--font-mono); font-size: 0.7rem;
+    color: var(--muted); min-width: 22px; text-align: right; flex-shrink: 0;
+  }
+  .toc-item.active .num { color: var(--accent); }
+  .toc-item .label { flex: 1; min-width: 0; }
+
+  .progress-block { margin-top: auto; padding-top: 18px; border-top: 1px solid var(--whisper); }
+  .progress-label {
+    font-family: var(--font-mono); font-size: 0.65rem;
+    letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted);
+    margin-bottom: 8px; display: flex; justify-content: space-between;
+  }
+  .progress-bar { height: 4px; background: var(--whisper); border-radius: 2px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--accent); transition: width 320ms var(--ease); border-radius: 2px; }
+
+  .cd-sidebar-link {
+    display: flex; align-items: center; gap: 10px;
+    margin-top: 14px; padding: 10px 8px;
+    border-radius: var(--radius-sm); text-decoration: none;
+    color: var(--muted); transition: background 180ms var(--ease);
+  }
+  .cd-sidebar-link:hover { background: rgba(255,255,255,0.03); color: var(--ink); }
+  .cd-monogram { width: 28px; height: 28px; border-radius: 6px; }
+  .cd-sidebar-text { display: flex; flex-direction: column; line-height: 1.1; }
+  .cd-sidebar-label { font-family: var(--font-mono); font-size: 0.55rem; letter-spacing: 0.16em; text-transform: uppercase; }
+  .cd-sidebar-name { font-size: 0.78rem; font-weight: 600; color: var(--ink); }
+
+  .tutorial-ad {
+    position: fixed;
+    left: calc(var(--sidebar-w) + 24px);
+    right: 24px;
+    bottom: 16px;
+    max-width: 760px;
+    margin: 0 auto;
+    height: 100px;
+    background: var(--surface-2);
+    border: 1px solid var(--whisper);
+    border-radius: var(--radius-md);
+    padding: 4px 10px 6px;
+    z-index: 4;
+    pointer-events: auto;
+    transition: opacity 220ms var(--ease);
+  }
+  .tutorial-ad-label {
+    font-family: var(--font-mono); font-size: 9px; font-weight: 600;
+    letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--muted); opacity: 0.55; margin-bottom: 2px; line-height: 1;
+  }
+  .tutorial-ad ins.adsbygoogle { display: block; width: 100%; height: 80px; }
+  body[data-current-slide="0"] .tutorial-ad,
+  body[data-current-slide="10"] .tutorial-ad { opacity: 0; pointer-events: none; }
+  @media (max-width: 900px) {
+    .tutorial-ad { left: 12px; right: 12px; bottom: 14px; height: 90px; }
+    .tutorial-ad ins.adsbygoogle { height: 70px; }
+  }
+
+  .stage {
+    position: relative; overflow: hidden;
+    background:
+      radial-gradient(circle at 90% 10%, rgba(255,107,74,0.07), transparent 55%),
+      radial-gradient(circle at 10% 90%, rgba(91,157,249,0.05), transparent 55%),
+      var(--canvas);
+  }
+  .slide {
+    position: absolute; inset: 0;
+    padding: 60px 80px 140px;
+    overflow-y: auto; overflow-x: hidden;
+    opacity: 0; transform: translateY(20px); pointer-events: none;
+    transition: opacity 380ms var(--ease), transform 380ms var(--ease);
+    -webkit-overflow-scrolling: touch;
+  }
+  .slide.active { opacity: 1; transform: none; pointer-events: auto; }
+  @media (max-width: 900px) {
+    :root { --sidebar-w: 240px; }
+    .slide { padding: 40px 36px 130px; }
+  }
+
+  .slide-inner { max-width: 980px; margin: 0 auto; display: flex; flex-direction: column; }
+  .slide-inner.center { min-height: calc(100vh - 240px); justify-content: center; }
+
+  .slide-eyebrow {
+    font-family: var(--font-mono); font-size: 0.7rem; font-weight: 600;
+    letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent);
+    margin-bottom: 22px; display: inline-flex; align-items: center; gap: 12px;
+  }
+  .slide-eyebrow::before { content: ""; width: 28px; height: 1px; background: var(--accent); }
+  .slide-eyebrow.muted { color: var(--muted); }
+  .slide-eyebrow.muted::before { background: var(--muted); }
+
+  .slide h1 {
+    font-size: clamp(2.4rem, 5.2vw, 4.4rem);
+    font-weight: 800; letter-spacing: -0.035em; line-height: 1.02;
+    margin-bottom: 26px; max-width: 18ch;
+  }
+  .slide h1 em { font-style: normal; color: var(--accent); }
+  .slide h2 {
+    font-size: clamp(1.8rem, 3.6vw, 2.6rem);
+    font-weight: 700; letter-spacing: -0.022em; line-height: 1.1;
+    margin-bottom: 18px; max-width: 22ch;
+  }
+  .slide h3 { font-size: 1.4rem; font-weight: 700; letter-spacing: -0.012em; margin-bottom: 12px; }
+  .slide p, .slide li { color: rgba(242,241,237,0.86); }
+  .slide .lede {
+    font-size: 1.18rem; color: var(--muted); max-width: 60ch;
+    margin-bottom: 30px; line-height: 1.5;
+  }
+  .slide ul, .slide ol { margin: 14px 0 18px 22px; }
+  .slide li { margin-bottom: 9px; font-size: 1rem; }
+  .slide a {
+    color: var(--accent); text-decoration: none;
+    border-bottom: 1px solid rgba(255,107,74,0.35);
+    transition: border-color 180ms var(--ease);
+  }
+  .slide a:hover { border-bottom-color: var(--accent); }
+
+  kbd {
+    background: var(--surface-2); border: 1px solid var(--whisper-strong);
+    border-radius: 4px; padding: 2px 7px;
+    font-family: var(--font-mono); font-size: 0.78em; color: var(--ink);
+  }
+
+  pre {
+    background: var(--surface); border: 1px solid var(--whisper);
+    border-radius: var(--radius-md); padding: 18px 22px;
+    overflow-x: auto; font-family: var(--font-mono);
+    font-size: 0.85rem; line-height: 1.65; margin: 16px 0; color: #d8d8db;
+  }
+  code:not(pre code) {
+    background: rgba(255,107,74,0.08); color: var(--accent);
+    padding: 2px 7px; border-radius: 5px;
+    font-family: var(--font-mono); font-size: 0.85em;
+  }
+  .code-label {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: var(--font-mono); font-size: 0.66rem;
+    font-weight: 500; letter-spacing: 0.14em; color: var(--muted);
+    text-transform: uppercase; margin-bottom: 6px;
+  }
+  .code-label::before { content: "$"; color: var(--accent); font-weight: 700; }
+
+  .callout {
+    border-left: 3px solid var(--accent);
+    background: rgba(255,107,74,0.06);
+    padding: 16px 20px;
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    margin: 18px 0; font-size: 0.96rem;
+  }
+  .callout.warn { border-left-color: var(--warn); background: rgba(210,153,34,0.07); }
+  .callout.danger { border-left-color: var(--danger); background: rgba(217,67,67,0.07); }
+  .callout.success { border-left-color: var(--success); background: rgba(74,157,124,0.07); }
+  .callout.info { border-left-color: var(--blue); background: rgba(91,157,249,0.06); }
+  .callout-title {
+    font-family: var(--font-mono); font-size: 0.7rem; font-weight: 600;
+    letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 6px;
+  }
+  .callout-title.accent { color: var(--accent); }
+  .callout-title.warn { color: var(--warn); }
+  .callout-title.success { color: var(--success); }
+  .callout-title.info { color: var(--blue); }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: start; }
+  @media (max-width: 900px) { .two-col { grid-template-columns: 1fr; } }
+
+  .three-col { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; align-items: start; margin: 18px 0; }
+  @media (max-width: 900px) { .three-col { grid-template-columns: 1fr; } }
+
+  .cover .cover-tag {
+    font-family: var(--font-mono); font-size: 0.72rem; font-weight: 600;
+    letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent);
+    margin-bottom: 22px; display: inline-flex; align-items: center; gap: 12px;
+  }
+  .cover .cover-tag::before { content: ""; width: 28px; height: 1px; background: var(--accent); }
+  .cover-meta {
+    display: flex; flex-wrap: wrap; gap: 18px;
+    color: var(--muted); font-size: 0.82rem; font-family: var(--font-mono);
+    margin-top: 32px;
+  }
+  .cover-meta .dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); margin-right: 8px; }
+
+  .steps { list-style: none; margin: 16px 0 !important; padding: 0; counter-reset: step; }
+  .steps li {
+    position: relative; padding: 16px 16px 16px 56px;
+    border-left: 1px solid var(--whisper); margin: 0 0 4px !important;
+    counter-increment: step;
+  }
+  .steps li::before {
+    content: counter(step, decimal-leading-zero);
+    position: absolute; left: -16px; top: 14px;
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--surface); border: 1px solid var(--whisper-strong);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent);
+  }
+  .steps li strong { color: var(--ink); display: block; margin-bottom: 4px; font-size: 1.02rem; }
+  .steps li span { color: rgba(242,241,237,0.78); font-size: 0.95rem; line-height: 1.55; }
+
+  .vault-tree {
+    background: var(--surface); border: 1px solid var(--whisper);
+    border-radius: var(--radius-md); padding: 22px 26px;
+    font-family: var(--font-mono); font-size: 0.84rem; line-height: 1.85;
+    color: var(--ink); margin: 16px 0;
+  }
+  .vault-tree .folder { color: var(--accent); }
+  .vault-tree .meta   { color: var(--muted); }
+  .vault-tree .added  { color: var(--success); }
+
+  .law-card {
+    background: var(--surface); border: 1px solid var(--whisper);
+    border-radius: var(--radius-lg); padding: 24px 26px;
+    box-shadow: var(--shadow-md);
+  }
+  .law-card .num {
+    font-family: var(--font-mono); font-size: 0.62rem; font-weight: 600;
+    letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); margin-bottom: 10px;
+  }
+  .law-card h3 { font-size: 1.2rem; margin-bottom: 10px; }
+  .law-card p { color: rgba(242,241,237,0.82); font-size: 0.95rem; }
+
+  .prompt-box {
+    position: relative;
+    background: var(--surface); border: 1px solid var(--whisper);
+    border-radius: var(--radius-lg); padding: 22px 26px 26px;
+    margin: 16px 0; box-shadow: var(--shadow-md);
+  }
+  .prompt-box pre {
+    margin: 0; background: var(--canvas); border-color: var(--whisper-strong);
+    max-height: 280px; overflow-y: auto;
+  }
+  .prompt-actions { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+  .prompt-btn {
+    padding: 9px 16px; border-radius: var(--radius-md);
+    font-family: var(--font-mono); font-size: 0.78rem; font-weight: 600;
+    letter-spacing: 0.06em; cursor: pointer; border: 1px solid transparent;
+    background: var(--accent); color: var(--canvas);
+    transition: background 180ms var(--ease);
+  }
+  .prompt-btn:hover { background: var(--accent-pressed); }
+  .prompt-btn.outline { background: transparent; color: var(--ink); border-color: var(--whisper-strong); }
+  .prompt-btn.outline:hover { border-color: var(--accent); color: var(--accent); }
+
+  .nav-controls {
+    position: fixed; bottom: 24px;
+    left: calc(var(--sidebar-w) + 32px);
+    display: flex; align-items: center; gap: 12px;
+    pointer-events: none; z-index: 30;
+  }
+  .nav-btn {
+    pointer-events: auto;
+    width: 44px; height: 44px; border-radius: 50%;
+    background: var(--accent); border: 1px solid var(--accent);
+    color: var(--canvas);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; font-size: 1.15rem; font-weight: 700;
+    transition: background 180ms var(--ease), border-color 180ms var(--ease), transform 180ms var(--ease);
+  }
+  .nav-btn:hover:not(:disabled) {
+    background: var(--accent-pressed); border-color: var(--accent-pressed);
+    transform: scale(1.05);
+  }
+  .nav-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+  .nav-btn:disabled:hover { background: var(--accent); border-color: var(--accent); transform: none; }
+  @keyframes pulse-next {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+  }
+  body[data-current-slide="0"] #next-btn { animation: pulse-next 2.2s ease-in-out infinite; }
+  body[data-current-slide="0"] #next-btn:hover { transform: scale(1.12); }
+  .slide-counter {
+    pointer-events: auto;
+    font-family: var(--font-mono); font-size: 0.78rem;
+    letter-spacing: 0.14em; color: var(--canvas);
+    background: var(--accent); border: 1px solid var(--accent);
+    border-radius: 999px; padding: 9px 18px;
+    display: flex; align-items: center; gap: 8px; font-weight: 700;
+  }
+  .slide-counter .sep { opacity: 0.55; }
+  @media (max-width: 900px) {
+    .nav-controls { left: 24px; bottom: 18px; gap: 8px; }
+    .nav-btn { width: 40px; height: 40px; font-size: 1rem; }
+  }
+
+  .social-icons {
+    position: fixed; top: 18px; right: 22px;
+    display: flex; gap: 8px; z-index: 30; pointer-events: auto;
+  }
+  .social-icons a {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 36px; height: 36px; border-radius: 50%;
+    background: var(--surface); border: 1px solid var(--whisper);
+    color: var(--ink); text-decoration: none;
+    transition: background 200ms var(--ease), border-color 200ms var(--ease), color 200ms var(--ease), transform 200ms var(--ease);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+  .social-icons a:hover {
+    background: var(--surface-2); border-color: var(--accent);
+    color: var(--accent); transform: translateY(-2px);
+  }
+  .social-icons svg { width: 16px; height: 16px; fill: currentColor; }
+  .social-icons .cd-circle { padding: 0; overflow: hidden; }
+  .social-icons .cd-circle img {
+    width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 50%;
+  }
+  @media (max-width: 720px) {
+    .social-icons { top: 14px; right: 14px; gap: 6px; }
+    .social-icons a { width: 32px; height: 32px; }
+  }
+
+</style>
+</head>
+<body>
+
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <svg class="brand-mark" viewBox="0 0 32 32" fill="none">
+        <rect x="2" y="2" width="28" height="28" rx="7" fill="#FF6B4A"/>
+        <path d="M10 16 L14 20 L22 12" stroke="#0E0E10" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <div class="brand-text">
+        <span class="name">Coherent Obsidian Skills</span>
+        <span class="tag">Episode 01 · Organized Brain</span>
+      </div>
+    </div>
+
+    <div class="toc-section">Why</div>
+    <button class="toc-item" data-slide="0"><span class="num">01</span><span class="label">Folders ≠ meaning</span></button>
+    <button class="toc-item" data-slide="1"><span class="num">02</span><span class="label">What you walk away with</span></button>
+    <button class="toc-item" data-slide="2"><span class="num">03</span><span class="label">Prerequisites</span></button>
+
+    <div class="toc-section">Build</div>
+    <button class="toc-item" data-slide="3"><span class="num">04</span><span class="label">Step 1 · Install the skill</span></button>
+    <button class="toc-item" data-slide="4"><span class="num">05</span><span class="label">Step 2 · Drop the kit</span></button>
+    <button class="toc-item" data-slide="5"><span class="num">06</span><span class="label">Step 3 · The two laws</span></button>
+    <button class="toc-item" data-slide="6"><span class="num">07</span><span class="label">Step 4 · Backfill on touch</span></button>
+    <button class="toc-item" data-slide="7"><span class="num">08</span><span class="label">Step 5 · Re-index &amp; ask</span></button>
+
+    <div class="toc-section">Wrap</div>
+    <button class="toc-item" data-slide="8"><span class="num">09</span><span class="label">The series</span></button>
+    <button class="toc-item" data-slide="9"><span class="num">10</span><span class="label">Copy-paste prompt</span></button>
+    <button class="toc-item" data-slide="10"><span class="num">11</span><span class="label">You're done</span></button>
+
+    <div class="progress-block">
+      <div class="progress-label">
+        <span>Progress</span>
+        <span id="progress-text">1 / 11</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill" style="width: 9.09%"></div>
+      </div>
+    </div>
+
+    <a class="cd-sidebar-link" href="https://coherencedaddy.com" target="_blank" rel="noopener">
+      <img class="cd-monogram" src="cd-face-coral.png" alt="Coherence Daddy" />
+      <span class="cd-sidebar-text">
+        <span class="cd-sidebar-label">Brought to you by</span>
+        <span class="cd-sidebar-name">coherencedaddy.com</span>
+      </span>
+    </a>
+
+    <div class="ad-slot">
+      <div class="ad-label">Advertisement</div>
+      <ins class="adsbygoogle"
+           style="display:block"
+           data-ad-client="ca-pub-1882924299982046"
+           data-ad-slot="6522431533"
+           data-ad-format="auto"
+           data-full-width-responsive="true"></ins>
+    </div>
+  </aside>
+
+  <main class="stage" id="stage">
+
+    <!-- 01 · Cover -->
+    <section class="slide active" data-slide="0">
+      <div class="slide-inner center cover">
+        <div class="cover-tag">Coherent Obsidian Skills · 01</div>
+        <h1>Folders organize bytes. <em>Frontmatter organizes meaning.</em></h1>
+        <p class="lede">
+          Your Obsidian vault is full of notes Claude can't reliably find.
+          Add a 4-line YAML block to every note that turns your vault into a
+          typed knowledge graph Claude can reason about — using two free
+          upstream patterns and zero new tools.
+        </p>
+        <div class="cover-meta">
+          <span><span class="dot"></span> 11 slides · ~5 min read · ~10 min install</span>
+          <span><span class="dot" style="background: var(--blue);"></span> Obsidian + Claude Code + (optional) local-brain</span>
+          <span><span class="dot" style="background: var(--success);"></span> macOS · Windows · Linux</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 02 · What you walk away with -->
+    <section class="slide" data-slide="1">
+      <div class="slide-inner">
+        <div class="slide-eyebrow">Outcome</div>
+        <h2>Three artifacts. One coherent vault.</h2>
+        <p class="lede">By the end you have a vault that's organized for both human eyes and machine queries — and a kit you can drop into the next vault you build.</p>
+
+        <div class="three-col">
+          <div>
+            <h3 style="color: var(--accent);">A skill</h3>
+            <p style="color: rgba(242,241,237,0.78);"><code>obsidian-power-user</code> in your <code>.claude/skills/</code>. Claude now knows every Obsidian feature — Templates, Bases, Dataview, Canvas, plugin lore.</p>
+          </div>
+          <div>
+            <h3 style="color: var(--blue);">A frontmatter graph</h3>
+            <p style="color: rgba(242,241,237,0.78);">Every note declares <code>categories: [[Project]]</code>. Wikilinks-in-YAML become typed graph edges Obsidian renders <em>and</em> indexers parse without NLP.</p>
+          </div>
+          <div>
+            <h3 style="color: var(--success);">A repeatable kit</h3>
+            <p style="color: rgba(242,241,237,0.78);">Six templates, six category index stubs, one conventions doc. Drop into any vault — yours, a teammate's, the next one you spin up.</p>
+          </div>
+        </div>
+
+        <div class="callout info">
+          <div class="callout-title info">Why both, together</div>
+          The skill teaches Claude how Obsidian works. The graph teaches your vault how to be queried. Either alone is half the loop.
+        </div>
+      </div>
+    </section>
+
+    <!-- 03 · Prerequisites -->
+    <section class="slide" data-slide="2">
+      <div class="slide-inner">
+        <div class="slide-eyebrow">Before you start</div>
+        <h2>What you need on hand.</h2>
+
+        <ol class="steps">
+          <li>
+            <strong>Obsidian, on any vault.</strong>
+            <span>If you don't have a vault yet, the previous tutorial (<a href="https://coherencedaddy.com/tutorials/give-obsidian-a-memory">Give Obsidian a Memory</a>) sets one up end-to-end with local-brain wired in.</span>
+          </li>
+          <li>
+            <strong>Claude Code, in a project repo.</strong>
+            <span>Anywhere a <code>.claude/skills/</code> directory makes sense. The skill applies repo-wide.</span>
+          </li>
+          <li>
+            <strong>(Optional) local-brain.</strong>
+            <span>If you want semantic search over the new graph, install <a href="https://github.com/Coherence-Daddy/use-ollama-to-enhance-claude">local-brain</a>. The graph still works in plain Obsidian without it.</span>
+          </li>
+          <li>
+            <strong>~10 minutes.</strong>
+            <span>Install: 60 seconds. Drop the kit: 30 seconds. Backfill existing project notes: ~2 minutes per project. Verify: 1 minute.</span>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- 04 · Step 1 — Install the skill -->
+    <section class="slide" data-slide="3">
+      <div class="slide-inner">
+        <div class="slide-eyebrow">Step 01</div>
+        <h2>Install the Obsidian Power-User skill.</h2>
+        <p class="lede">Two folders, lifted from <a href="https://github.com/Sleestk/Skills-Pipeline">Sleestk/Skills-Pipeline</a>. No installer, no manifest — just a copy.</p>
+
+        <div class="code-label">Terminal</div>
+        <pre>git clone --depth 1 https://github.com/Sleestk/Skills-Pipeline.git /tmp/skills-pipeline
+cp -R /tmp/skills-pipeline/Obsidian/obsidian-power-user .claude/skills/obsidian-power-user
+cp -R /tmp/skills-pipeline/SaaS/stripe-developer       .claude/skills/stripe-developer  # optional</pre>
+
+        <div class="callout success">
+          <div class="callout-title success">Verify</div>
+          Open a fresh Claude Code session in your project. Ask "what skills do you have available?" — <code>obsidian-power-user</code> should appear with its description string. That's the proof it loaded.
+        </div>
+
+        <p style="color: var(--muted); margin-top: 14px;">Stripe is optional — pull it if you're shipping payments. The Obsidian skill is the one that pairs with the kit on the next slide.</p>
+
+        <div class="callout info">
+          <div class="callout-title info">Track the source</div>
+          Drop a <code>.claude/skills/README.md</code> recording the upstream URL and SHA so the next refresh is mechanical, not archaeology.
+        </div>
+      </div>
+    </section>
+
+    <!-- 05 · Step 2 — Drop the kit -->
+    <section class="slide" data-slide="4">
+      <div class="slide-inner">
+        <div class="slide-eyebrow">Step 02</div>
+        <h2>Drop the kit into your vault.</h2>
+        <p class="lede">The kit is six templates, six category index stubs, and one conventions doc. Total: 13 small markdown files. Nothing else.</p>
+
+        <div class="vault-tree">
+<span class="folder">vault-scaffolding/</span>
+├── <span class="added">_CONVENTIONS.md</span>                    <span class="meta">← The two laws + properties cheat sheet</span>
+├── <span class="folder">Templates/</span>
+│   ├── <span class="added">Note Template.md</span>               <span class="meta">← Generic evergreen</span>
+│   ├── <span class="added">Project Template.md</span>            <span class="meta">← Working initiative</span>
+│   ├── <span class="added">Person Template.md</span>             <span class="meta">← Specific person</span>
+│   ├── <span class="added">Reference Template.md</span>          <span class="meta">← External entity</span>
+│   ├── <span class="added">Decision Template.md</span>           <span class="meta">← Captured choice</span>
+│   └── <span class="added">Daily Template.md</span>              <span class="meta">← Daily journal note</span>
+└── <span class="folder">Categories/</span>
+    ├── <span class="added">Project.md  People.md</span>
+    ├── <span class="added">Reference.md  Decision.md</span>
+    └── <span class="added">Evergreen.md  Daily.md</span></div>
+
+        <div class="two-col">
+          <div>
+            <h3>Install</h3>
+            <ol>
+              <li>Drag <code>_CONVENTIONS.md</code>, <code>Templates/</code>, <code>Categories/</code> into your vault root.</li>
+              <li><strong>Settings → Core plugins → Templates</strong> → on; folder location <code>Templates</code>.</li>
+              <li>(Optional) <strong>Settings → Core plugins → Daily notes</strong> → point at <code>Templates/Daily Template.md</code>.</li>
+            </ol>
+          </div>
+          <div>
+            <h3>What's NOT touched</h3>
+            <ul>
+              <li>Your existing folder structure</li>
+              <li>Existing notes (no mass migration)</li>
+              <li>Your <code>.obsidian/</code> plugin list</li>
+              <li>Any shortcut files at vault root</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 06 · Step 3 — The two laws -->
+    <section class="slide" data-slide="5">
+      <div class="slide-inner">
+        <div class="slide-eyebrow">Step 03</div>
+        <h2>The two laws of frontmatter graphs.</h2>
+        <p class="lede">Borrowed from <a href="https://github.com/kepano/kepano-obsidian">kepano's vault</a>. Two rules. No exceptions for new notes. Existing notes upgrade <em>on touch</em>.</p>
+
+        <div class="two-col">
+          <div class="law-card">
+            <div class="num">Law 01</div>
+            <h3>Every note declares <code>categories</code>.</h3>
+            <p>One or more wikilinks pointing to a <code>Categories/&lt;Type&gt;.md</code> index file. Required field. No exceptions.</p>
+            <pre style="margin-top: 12px;">---
+categories: ["[[Project]]"]
+---</pre>
+          </div>
+          <div class="law-card">
+            <div class="num">Law 02</div>
+            <h3>Typed relations are wikilinks, not strings.</h3>
+            <p>Author? <code>author: ["[[Steph Ango]]"]</code>. Topic? <code>topics: ["[[Knowledge graphs]]"]</code>. Org? <code>org: ["[[Anthropic]]"]</code>. Never plain text.</p>
+            <pre style="margin-top: 12px;">---
+categories: ["[[Reference]]"]
+author: ["[[Kepano]]"]
+topics: ["[[PKM]]", "[[Bottom-up]]"]
+---</pre>
+          </div>
+        </div>
+
+        <div class="callout">
+          <div class="callout-title accent">Why this is gold for AI</div>
+          Wikilinks-in-YAML are valid YAML <em>and</em> valid graph edges. The Obsidian graph view reads them. Bases queries read them. local-brain's parser reads them — preserved verbatim as <code>"frontmatter": {"categories": ["[[Project]]"]}</code> in the Qdrant payload. One source of truth, zero NLP, three readers.
+        </div>
+      </div>
+    </section>
+
+    <!-- 07 · Step 4 — Backfill on touch -->
+    <section class="slide" data-slide="6">
+      <div class="slide-inner">
+        <div class="slide-eyebrow">Step 04</div>
+        <h2>Backfill on touch. Don't migrate.</h2>
+        <p class="lede">A mass-migration script gives up halfway. The lazy-but-correct path: add <code>categories:</code> to a note next time you open it. Two weeks in, your graph fills itself.</p>
+
+        <div class="two-col">
+          <div>
+            <h3 style="color: var(--accent);">Before</h3>
+            <pre>---
+project: "Team-Dashboard"
+type: readme
+tags: []
+---
+
+# Project Overview</pre>
+          </div>
+          <div>
+            <h3 style="color: var(--success);">After</h3>
+            <pre>---
+project: "Team-Dashboard"
+type: readme
+<span style="color: var(--success); font-weight: 600;">categories: ["[[Project]]"]</span>
+tags: []
+---
+
+# Project Overview</pre>
+          </div>
+        </div>
+
+        <div class="callout success">
+          <div class="callout-title success">High-leverage one-time pass</div>
+          For project notes specifically — open every <code>Projects/&lt;slug&gt;/README.md</code> + <code>infrastructure.md</code> once and add the line. Mechanical, ~10 seconds per project. Pays for itself the first time you ask Claude "what's categorized as a Project?"
+        </div>
+
+        <p style="color: var(--muted); margin-top: 14px;">For everything else: backfill on next edit. The convention compounds — fast notes stay fast, important notes get the field organically.</p>
+      </div>
+    </section>
+
+    <!-- 08 · Step 5 — Re-index and ask -->
+    <section class="slide" data-slide="7">
+      <div class="slide-inner">
+        <div class="slide-eyebrow">Step 05</div>
+        <h2>Re-index. Ask.</h2>
+        <p class="lede">If you're running local-brain, this is the proof step. The new <code>categories:</code> field should land in Qdrant as a structured payload, not a text blob.</p>
+
+        <div class="code-label">Terminal · in your team-dashboard repo or any project with local-brain</div>
+        <pre>/sync                    # re-index both vaults via local-brain
+/ask "what's categorized as a Project?"</pre>
+
+        <p style="color: rgba(242,241,237,0.86); margin-top: 14px;">The reply should cite your backfilled README files. If it does — <strong>the graph is live</strong>. If it doesn't, your indexer is treating frontmatter as plain text. That's an upgrade target for the indexer, not a blocker for the convention.</p>
+
+        <div class="callout info">
+          <div class="callout-title info">Without local-brain</div>
+          You still get the Obsidian graph view, Bases queries, Dataview, and a typed schema for any future indexer. The convention is decoupled from the tool.
+        </div>
+
+        <div class="callout success">
+          <div class="callout-title success">Visual confirm in Obsidian</div>
+          Open any backfilled note. The Properties panel at top shows <code>categories: Project ×</code> as a clickable orange chip. Click it → Obsidian opens <code>Categories/Project.md</code>. Open the graph view → category is now an edge. That's the loop.
+        </div>
+      </div>
+    </section>
+
+    <!-- 09 · The series -->
+    <section class="slide" data-slide="8">
+      <div class="slide-inner">
+        <div class="slide-eyebrow">Series</div>
+        <h2>This is episode 01 of <em>Coherent Obsidian Skills</em>.</h2>
+        <p class="lede">A series of small, focused skills + conventions that sharpen the loop between Claude and Obsidian. Each episode ships a skill, a vault pattern, and a tutorial like this one.</p>
+
+        <div class="vault-tree">
+<span class="folder">Coherent Obsidian Skills</span>
+├── <span class="added">01 · Give Claude an Organized Brain</span>          <span class="meta">← you are here</span>
+├── <span class="meta">02 · TBD — published as the series ships</span>
+└── <span class="meta">03 · TBD — published as the series ships</span></div>
+
+        <div class="two-col">
+          <div>
+            <h3 style="color: var(--accent);">Where the source lives</h3>
+            <p>Public mirror per episode under <a href="https://github.com/orgs/Coherence-Daddy">github.com/Coherence-Daddy</a>. MIT-licensed. Includes the slide deck HTML and a copy-paste prompt.</p>
+          </div>
+          <div>
+            <h3 style="color: var(--blue);">Where the live tutorials live</h3>
+            <p>Always at <a href="https://coherencedaddy.com/tutorials">coherencedaddy.com/tutorials</a>. Subdirectory, not subdomain. Slugs are locked at publish.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10 · Copy-paste prompt -->
+    <section class="slide" data-slide="9">
+      <div class="slide-inner">
+        <div class="slide-eyebrow">Hand off the work</div>
+        <h2>Drop this prompt into Claude. Watch the kit land itself.</h2>
+        <p class="lede">If you'd rather have Claude do the cloning, copying, and backfilling — paste this and it takes the wheel.</p>
+
+        <div class="prompt-box">
+          <div class="code-label">Copy-paste prompt</div>
+          <pre id="copy-paste-target">You are my Coherent Obsidian Skills · 01 setup operator. Goal: install the
+obsidian-power-user skill into my Claude Code project, drop the kepano-style
+vault scaffolding kit into my Obsidian vault, and backfill categories: [[Project]]
+on every existing project note. Do 95% of the work yourself.
+
+Steps you own:
+1. Clone https://github.com/Sleestk/Skills-Pipeline.git to /tmp/skills-pipeline.
+2. Copy Obsidian/obsidian-power-user into &lt;repo&gt;/.claude/skills/obsidian-power-user.
+3. Write &lt;repo&gt;/.claude/skills/README.md recording source URL + SHA.
+4. Clone or copy the vault-scaffolding kit (templates + categories + _CONVENTIONS.md).
+5. Drop the kit into my vault root (ask me which vault if multiple).
+6. Set .obsidian/templates.json to {"folder": "Templates"} so the Templates plugin uses it.
+7. For every Projects/&lt;slug&gt;/README.md and infrastructure.md, insert
+   `categories: ["[[Project]]"]` into the YAML frontmatter. Files without
+   frontmatter get a fresh block prepended.
+8. If local-brain is configured, run /sync and report indexed count.
+9. Tell me what changed and what's left for me to verify visually in Obsidian.
+
+Rules:
+- Render a checklist as your first reply. Update it after every step.
+- Never run mass-migrate scripts on existing non-project notes — additive only.
+- Never touch shortcut files at vault root (anything starting with an emoji
+  or with `type: shortcut` in frontmatter).
+- One step at a time. Confirm, advance.
+
+Start by asking my OS, my project repo path, and my Obsidian vault path.</pre>
+          <div class="prompt-actions">
+            <button class="prompt-btn" id="copy-prompt-btn">Copy prompt</button>
+            <a class="prompt-btn outline" href="copy-paste-prompt.md" download>Download .md</a>
+          </div>
+        </div>
+
+        <div class="callout info">
+          <div class="callout-title info">If Claude can't reach your vault</div>
+          Some sandboxed sessions can't write to <code>~/Documents/</code>. In that case, Claude stages the kit in your repo at <code>vault-scaffolding/</code> and you drag it into the vault yourself. Same end state, same tutorial.
+        </div>
+      </div>
+    </section>
+
+    <!-- 11 · You're done -->
+    <section class="slide" data-slide="10">
+      <div class="slide-inner center cover">
+        <div class="cover-tag">Episode 01 · Done</div>
+        <h1>Your vault is <em>queryable</em>.</h1>
+        <p class="lede">
+          Folders are still buckets. But now your notes carry meaning Claude
+          can read. Every <code>categories:</code> chip is a graph edge, an
+          indexer payload, and a future-Bases query — written once, read
+          three ways.
+        </p>
+        <div class="cover-meta">
+          <span><span class="dot"></span> Repo: <a href="https://github.com/Coherence-Daddy/give-claude-an-organized-brain" target="_blank">github.com/Coherence-Daddy/give-claude-an-organized-brain</a></span>
+          <span><span class="dot" style="background: var(--blue);"></span> <a href="https://coherencedaddy.com" target="_blank">coherencedaddy.com</a></span>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- Floating nav controls · bottom-left -->
+<div class="nav-controls">
+  <button class="nav-btn" id="prev-btn" aria-label="Previous slide">‹</button>
+  <span class="slide-counter">
+    <span id="curr-num">01</span>
+    <span class="sep">/</span>
+    <span id="total-num">11</span>
+  </span>
+  <button class="nav-btn" id="next-btn" aria-label="Next slide">›</button>
+</div>
+
+<!-- Social icons · top-right -->
+<nav class="social-icons" aria-label="Coherence Daddy social links">
+  <a href="https://x.com/coherencedaddy" target="_blank" rel="noopener" title="Follow on X" aria-label="X (Twitter)">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+    </svg>
+  </a>
+  <a href="https://discord.gg/TtaK7WTP5" target="_blank" rel="noopener" title="Join the Discord" aria-label="Discord">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189z"/>
+    </svg>
+  </a>
+  <a href="https://github.com/Coherence-Daddy" target="_blank" rel="noopener" title="GitHub" aria-label="GitHub">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.4 3-.405 1.02.005 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>
+    </svg>
+  </a>
+</nav>
+
+<!-- Brutalist stamp · bottom-right of every slide (hidden on cover and last slide) -->
+<a class="cd-stamp" href="https://coherencedaddy.com" target="_blank" rel="noopener" title="Coherence Daddy">
+  <svg viewBox="0 0 420 160" xmlns="http://www.w3.org/2000/svg" aria-label="Coherence Daddy">
+    <rect x="4" y="4" width="412" height="152" fill="none" stroke="#F2F1ED" stroke-width="3"/>
+    <text x="210" y="58" text-anchor="middle" font-family="JetBrains Mono, ui-monospace, Menlo, monospace" font-weight="500" font-size="14" letter-spacing="4" fill="#FF6B4A">508(c)(1)(A)</text>
+    <text x="210" y="100" text-anchor="middle" font-family="Geist, system-ui, sans-serif" font-weight="800" font-size="36" letter-spacing="-1.5" fill="#F2F1ED">Coherence Daddy</text>
+    <text x="210" y="132" text-anchor="middle" font-family="JetBrains Mono, ui-monospace, Menlo, monospace" font-weight="500" font-size="11" letter-spacing="4" fill="#F2F1ED" opacity="0.65">FAITH-DRIVEN TECHNOLOGY</text>
+  </svg>
+</a>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const tocItems = document.querySelectorAll('.toc-item');
+  const prevBtn = document.getElementById('prev-btn');
+  const nextBtn = document.getElementById('next-btn');
+  const currNum = document.getElementById('curr-num');
+  const totalNum = document.getElementById('total-num');
+  const progressFill = document.getElementById('progress-fill');
+  const progressText = document.getElementById('progress-text');
+  const total = slides.length;
+  let current = 0;
+  totalNum.textContent = String(total).padStart(2, '0');
+
+  function goTo(idx) {
+    if (idx < 0 || idx >= total) return;
+    slides[current].classList.remove('active');
+    tocItems[current]?.classList.remove('active');
+    current = idx;
+    slides[current].classList.add('active');
+    tocItems[current]?.classList.add('active');
+    slides[current].scrollTop = 0;
+    tocItems[current]?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    currNum.textContent = String(current + 1).padStart(2, '0');
+    const pct = ((current + 1) / total) * 100;
+    progressFill.style.width = pct + '%';
+    progressText.textContent = `${current + 1} / ${total}`;
+    prevBtn.disabled = (current === 0);
+    nextBtn.disabled = (current === total - 1);
+    history.replaceState(null, '', `#slide-${current + 1}`);
+    document.body.dataset.currentSlide = String(current);
+  }
+
+  prevBtn.addEventListener('click', () => goTo(current - 1));
+  nextBtn.addEventListener('click', () => goTo(current + 1));
+
+  tocItems.forEach((item) => {
+    item.addEventListener('click', () => {
+      const idx = parseInt(item.dataset.slide, 10);
+      goTo(idx);
+    });
+  });
+
+  document.addEventListener('keydown', (e) => {
+    const tag = (e.target.tagName || '').toLowerCase();
+    if (tag === 'input' || tag === 'textarea') return;
+    if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') {
+      e.preventDefault(); goTo(current + 1);
+    } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+      e.preventDefault(); goTo(current - 1);
+    } else if (e.key === 'Home') goTo(0);
+    else if (e.key === 'End') goTo(total - 1);
+  });
+
+  goTo(0);
+  const m = location.hash.match(/^#slide-(\d+)$/);
+  if (m) {
+    const n = parseInt(m[1], 10) - 1;
+    if (n >= 0 && n < total) goTo(n);
+  }
+
+  // Copy-paste prompt button
+  const copyBtn = document.getElementById('copy-prompt-btn');
+  if (copyBtn) {
+    copyBtn.addEventListener('click', async () => {
+      const text = document.getElementById('copy-paste-target').textContent;
+      try {
+        await navigator.clipboard.writeText(text);
+        const orig = copyBtn.textContent;
+        copyBtn.textContent = 'Copied ✓';
+        setTimeout(() => { copyBtn.textContent = orig; }, 1600);
+      } catch (e) {
+        copyBtn.textContent = 'Press ⌘C / Ctrl+C';
+      }
+    });
+  }
+
+  // AdSense
+  try { (window.adsbygoogle = window.adsbygoogle || []).push({}); } catch (e) {}
+</script>
+
+</body>
+</html>
